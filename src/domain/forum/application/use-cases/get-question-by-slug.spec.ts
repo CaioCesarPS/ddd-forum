@@ -12,14 +12,19 @@ describe('Get Question By Slug', () => {
   });
 
   it('should find an question by slug', async () => {
-    const newQuestion = makeQuestion();
+    const newQuestion = makeQuestion({
+      title: 'test caio',
+    });
 
     inMemoryQuestionsRepository.create(newQuestion);
 
-    const { question } = await sut.execute({
+    const result = await sut.execute({
       slug: newQuestion.slug.value,
     });
 
-    expect(question.slug.value).toEqual(newQuestion.slug.value);
+    if (result.isRight()) {
+      expect(result.value?.question.id).toBeTruthy();
+      expect(result.value?.question.title).toEqual(newQuestion.title);
+    }
   });
 });

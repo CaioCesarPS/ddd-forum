@@ -2,6 +2,7 @@ import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questio
 import { makeQuestion } from 'test/factories/make-question';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { EditQuestionUseCase } from './edit-question';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 // Arrange (Preparar o teste), Act (Rodar o teste) e Assert (Verificar as asserções)
 
@@ -27,7 +28,7 @@ describe('Edit question', () => {
     inMemoryQuestionsRepository.create(newQuestion);
 
     // act
-    await sut.execute({
+    const result = await sut.execute({
       questionId: '123',
       authorId: 'author-1',
       content: 'new content',
@@ -35,6 +36,7 @@ describe('Edit question', () => {
     });
 
     expect(inMemoryQuestionsRepository.items).toHaveLength(1);
+    expect(result.isRight()).toBe(true);
   });
 
   it('should not be able to edit a question from another user', async () => {
@@ -47,13 +49,13 @@ describe('Edit question', () => {
 
     inMemoryQuestionsRepository.create(newQuestion);
 
-    expect(async () => {
-      await sut.execute({
-        questionId: '123',
-        authorId: 'author-2',
-        content: 'new content',
-        title: 'new title',
-      });
-    }).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      questionId: '123',
+      authorId: 'author-2',
+      content: 'new content',
+      title: 'new title',
+    });
+
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 });

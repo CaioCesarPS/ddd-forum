@@ -39,8 +39,6 @@ export class EditAnswerUseCase {
 
     await this.answersRepository.save(answer);
 
-    return right({
-      answer,
-    });
+    return right({ answer });
   }
 }
