@@ -1,7 +1,7 @@
-import { SlugVO } from './slug'
+import { SlugVO } from './slug';
 
 test('it should be able to create a new slug from text', () => {
-  const slug = SlugVO.createFromText('Hello World')
+  const slug = SlugVO.createFromText('Olá, mundo!');
 
-  expect(slug.value).toEqual('hello-world')
-})
+  expect(slug.value).toEqual('ola-mundo');
+});

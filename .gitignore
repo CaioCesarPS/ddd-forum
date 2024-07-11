@@ -1,2 +1,2 @@
 node_modules/.vite/vitest
-node_modules
+**/node_modules
