@@ -1,9 +1,10 @@
-import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Question } from '@/domain/forum/enterprise/entities/question';
 import { QuestionsRepository } from '../repositories/questions-repository';
-import { Question } from '../../enterprise/entities/question';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Either, right } from '@/core/either';
-import { QuestionAttachment } from '../../enterprise/entities/question-attachment';
-import { QuestionAttachmentList } from '../../enterprise/entities/question-attachment-list';
+import { QuestionAttachment } from '@/domain/forum/enterprise/entities/question-attachment';
+import { QuestionAttachmentList } from '@/domain/forum/enterprise/entities/question-attachment-list';
+import { Injectable } from '@nestjs/common';
 
 interface CreateQuestionUseCaseRequest {
   authorId: string;
@@ -19,19 +20,20 @@ type CreateQuestionUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class CreateQuestionUseCase {
-  constructor(private questionRepository: QuestionsRepository) {}
+  constructor(private questionsRepository: QuestionsRepository) {}
 
   async execute({
     authorId,
-    content,
     title,
+    content,
     attachmentsIds,
   }: CreateQuestionUseCaseRequest): Promise<CreateQuestionUseCaseResponse> {
     const question = Question.create({
       authorId: new UniqueEntityID(authorId),
-      content,
       title,
+      content,
     });
 
     const questionAttachments = attachmentsIds.map((attachmentId) => {
@@ -43,7 +45,7 @@ export class CreateQuestionUseCase {
 
     question.attachments = new QuestionAttachmentList(questionAttachments);
 
-    await this.questionRepository.create(question);
+    await this.questionsRepository.create(question);
 
     return right({
       question,

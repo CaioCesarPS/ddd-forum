@@ -1,15 +1,22 @@
-export class SlugVO {
-  public value: string;
+export class Slug {
+  public value: string
 
   private constructor(value: string) {
-    this.value = value;
+    this.value = value
   }
 
-  static create(value: string): SlugVO {
-    return new SlugVO(value);
+  static create(value: string) {
+    return new Slug(value)
   }
 
-  static createFromText(text: string): SlugVO {
+  /**
+   * Receives a string and normalize it as a slug.
+   *
+   * Example: "An example title" => "an-example-title"
+   *
+   * @param text {string}
+   */
+  static createFromText(text: string): Slug {
     const slugText = text
       .normalize('NFKD')
       .toLowerCase()
@@ -18,8 +25,8 @@ export class SlugVO {
       .replace(/[^\w-]+/g, '')
       .replace(/_/g, '-')
       .replace(/--+/g, '-')
-      .replace(/-$/g, '');
+      .replace(/-$/g, '')
 
-    return new SlugVO(slugText);
+    return new Slug(slugText)
   }
 }

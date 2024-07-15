@@ -5,60 +5,30 @@ import { QuestionsRepository } from '@/domain/forum/application/repositories/que
 import { Question } from '@/domain/forum/enterprise/entities/question';
 
 export class InMemoryQuestionsRepository implements QuestionsRepository {
+  public items: Question[] = [];
+
   constructor(
     private questionAttachmentsRepository: QuestionAttachmentsRepository,
   ) {}
 
-  public items: Question[] = [];
-
-  async create(question: Question): Promise<void> {
-    this.items.push(question);
-
-    DomainEvents.dispatchEventsForAggregate(question.id);
-  }
-
-  async findBySlug(slug: string): Promise<Question | undefined> {
-    const question = this.items.find(
-      (question) => question.slug.value === slug,
-    );
-
-    if (!question) {
-      return undefined;
-    }
-
-    return question;
-  }
-
-  async delete(question: Question): Promise<void> {
-    const itemsWithoutDeleted = this.items.filter(
-      (item) => item.id.toString() !== question.id.toString(),
-    );
-
-    this.items = itemsWithoutDeleted;
-
-    this.questionAttachmentsRepository.deleteManyByQuestionId(
-      question.id.toString(),
-    );
-  }
-
-  async findById(id: string): Promise<Question | undefined> {
+  async findById(id: string) {
     const question = this.items.find((item) => item.id.toString() === id);
 
     if (!question) {
-      return undefined;
+      return null;
     }
 
     return question;
   }
 
-  async save(question: Question): Promise<void> {
-    const index = this.items.findIndex(
-      (item) => item.id.toString() === question.id.toString(),
-    );
+  async findBySlug(slug: string) {
+    const question = this.items.find((item) => item.slug.value === slug);
 
-    this.items[index] = question;
+    if (!question) {
+      return null;
+    }
 
-    DomainEvents.dispatchEventsForAggregate(question.id);
+    return question;
   }
 
   async findManyRecent({ page }: PaginationParams) {
@@ -67,5 +37,29 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
       .slice((page - 1) * 20, page * 20);
 
     return questions;
+  }
+
+  async create(question: Question) {
+    this.items.push(question);
+
+    DomainEvents.dispatchEventsForAggregate(question.id);
+  }
+
+  async save(question: Question) {
+    const itemIndex = this.items.findIndex((item) => item.id === question.id);
+
+    this.items[itemIndex] = question;
+
+    DomainEvents.dispatchEventsForAggregate(question.id);
+  }
+
+  async delete(question: Question) {
+    const itemIndex = this.items.findIndex((item) => item.id === question.id);
+
+    this.items.splice(itemIndex, 1);
+
+    this.questionAttachmentsRepository.deleteManyByQuestionId(
+      question.id.toString(),
+    );
   }
 }

@@ -1,26 +1,46 @@
-// First you need to install the extension Rest Client
-
 @baseUrl = http://localhost:3333
+@authToken = {{authenticate.response.body.access_token}}
 
-# @name Create_account
+
+# @name create_account
 
 POST {{baseUrl}}/accounts
 Content-Type: application/json
 
 {
-    "name": "John Doe",
-    "email": "caio_cesar_ps@hotmail.com",
-    "password": "123456"
+  "name": "Diego Fernandes",
+  "email": "diego@rocketseata.com.br",
+  "password": "123456"
 }
-
 ###
 
-# @name Authenticate
+# @name authenticate
 
 POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-    "email": "caio_cesar_ps@hotmail.com",
-    "password": "123456"
+  "email": "diego@rocketseata.com.br",
+  "password": "123456"
 }
+
+###
+
+
+# @name create_question
+
+POST {{baseUrl}}/questions
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "Nova perguntaaaaaaa",
+  "content": "Testeaaaaaa"
+}
+
+###
+
+# @name fetch_recent_questions
+GET {{baseUrl}}/questions?page=1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
